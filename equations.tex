@@ -1,0 +1,444 @@
+% ============================================================
+%  Tensegrity Tumbleweed Robot — Key Equations (LaTeX)
+%  Copy-paste these into your IEEE paper body as needed.
+% ============================================================
+
+% --------------------------------------------------
+% 1. DYNAMICS EQUATION
+% --------------------------------------------------
+
+% Newton's second law for each node
+\begin{equation}
+\label{eq:dynamics}
+\ddot{\mathbf{q}}_i = \frac{\mathbf{F}_i}{m_{\mathrm{node}}}
+\end{equation}
+
+% Total force on node i
+\begin{equation}
+\label{eq:total_force}
+\mathbf{F}_i = \mathbf{F}_{\mathrm{cable},i} + \mathbf{F}_{\mathrm{bar},i}
+             + \mathbf{F}_{\mathrm{grav},i} + \mathbf{F}_{\mathrm{contact},i}
+             + \mathbf{F}_{\mathrm{fric},i} + \mathbf{F}_{\mathrm{wind},i}
+             + \mathbf{F}_{\mathrm{damp},i}
+\end{equation}
+
+% Gravity on an inclined slope
+\begin{equation}
+\label{eq:gravity}
+\mathbf{g} = \begin{bmatrix}
+g\sin\theta \\ 0 \\ -g\cos\theta
+\end{bmatrix}, \qquad
+\mathbf{F}_{\mathrm{grav},i} = m_{\mathrm{node}}\,\mathbf{g}
+\end{equation}
+
+% Bar rigidity (bilateral penalty spring)
+\begin{equation}
+\label{eq:bar_force}
+\mathbf{F}_{\mathrm{bar}} = k_{\mathrm{bar}}
+\frac{L - L_{0,\mathrm{bar}}}{L}\,\mathbf{d}
+\end{equation}
+
+% Bar damping
+\begin{equation}
+\label{eq:bar_damp}
+\mathbf{F}_{\mathrm{bar,damp}} = c_{\mathrm{bar}}\,
+\bigl(\mathbf{v}_{\mathrm{rel}} \cdot \hat{\mathbf{d}}\bigr)\,\hat{\mathbf{d}}
+\end{equation}
+
+% Ground contact — normal force (penalty method)
+\begin{equation}
+\label{eq:contact_normal}
+F_{n,i} = \max\!\bigl(0,\; k_{\mathrm{gnd}}\,\delta_i
+          - d_{\mathrm{gnd}}\,\dot{z}_i\bigr)
+\end{equation}
+
+% Ground contact — Coulomb + viscous friction
+\begin{equation}
+\label{eq:friction}
+\mathbf{F}_{t,i} = -\mu_c\,F_{n,i}\,
+\frac{\mathbf{v}_{t,i}}{\|\mathbf{v}_{t,i}\| + \varepsilon}
+\;-\; \mu_v\,\mathbf{v}_{t,i}
+\end{equation}
+
+% Structural damping
+\begin{equation}
+\label{eq:struct_damp}
+\mathbf{F}_{\mathrm{damp},i} = -c_{\mathrm{damp}}\,\mathbf{v}_i
+\end{equation}
+
+
+% --------------------------------------------------
+% 2. WIND FORCE EQUATION
+% --------------------------------------------------
+
+% Relative wind velocity
+\begin{equation}
+\label{eq:v_rel}
+\mathbf{v}_{\mathrm{rel},i} = \mathbf{v}_{\mathrm{wind}} - \mathbf{v}_i
+\end{equation}
+
+% Aerodynamic drag on each exposed node
+\begin{equation}
+\label{eq:wind_force}
+\mathbf{F}_{\mathrm{drag},i} = \tfrac{1}{2}\,\rho_{\mathrm{air}}\,C_d\,
+A_{\mathrm{node}}\,\|\mathbf{v}_{\mathrm{rel},i}\|\,\mathbf{v}_{\mathrm{rel},i}
+\end{equation}
+
+% Exposure condition
+\begin{equation}
+\label{eq:wind_condition}
+\mathbf{F}_{\mathrm{drag},i} \neq \mathbf{0} \quad
+\text{iff} \quad z_i > z_{\mathrm{COM}} - \epsilon_z
+\end{equation}
+
+
+% --------------------------------------------------
+% 3. CABLE FORCE EQUATION
+% --------------------------------------------------
+
+% Unit direction vector along cable
+\begin{equation}
+\label{eq:cable_dir}
+\hat{\mathbf{d}} = \frac{\mathbf{q}_{n_2} - \mathbf{q}_{n_1}}
+{\|\mathbf{q}_{n_2} - \mathbf{q}_{n_1}\|}
+\end{equation}
+
+% Slack variable
+\begin{equation}
+\label{eq:slack}
+s = L - L_0
+\end{equation}
+
+% Softplus activation (smooth tension-only approximation)
+\begin{equation}
+\label{eq:softplus}
+\sigma(s) = \tfrac{1}{2}\!\left(s + \sqrt{s^2 + \varepsilon}\right),
+\qquad \varepsilon = 10^{-6}
+\end{equation}
+
+% Cable tension magnitude
+\begin{equation}
+\label{eq:cable_mag}
+f_{\mathrm{cable}} = \max\!\bigl(0,\;
+k_{\mathrm{cable}}\,\sigma(s) + u_{m,i}\bigr)
+\end{equation}
+
+% Cable force vector
+\begin{equation}
+\label{eq:cable_force}
+\mathbf{F}_{\mathrm{cable}} = f_{\mathrm{cable}}\,\hat{\mathbf{d}}
+\end{equation}
+
+% Saturation limits
+\begin{equation}
+\label{eq:cable_sat}
+f_{\mathrm{cable}} =
+\begin{cases}
+0       & \text{if } L < L_{\min} \\[4pt]
+u_{\max} & \text{if } L > L_{\max}
+\end{cases}
+\end{equation}
+
+
+% --------------------------------------------------
+% 4. NMPC COST FUNCTION
+% --------------------------------------------------
+
+% State tracking error
+\begin{equation}
+\label{eq:track_err}
+\mathbf{e}_k = \mathbf{x}_k - \mathbf{x}_{\mathrm{ref}}
+\end{equation}
+
+% Control increment
+\begin{equation}
+\label{eq:ctrl_inc}
+\Delta\mathbf{u}_k = \mathbf{u}_k - \mathbf{u}_{k-1}
+\end{equation}
+
+% Terminal weight
+\begin{equation}
+\label{eq:term_weight}
+w_k =
+\begin{cases}
+1 & k < N_p \\
+3 & k = N_p
+\end{cases}
+\end{equation}
+
+% Full NMPC cost function
+\begin{equation}
+\label{eq:nmpc_cost}
+J = \sum_{k=1}^{N_p} \left[
+  w_k\,\mathbf{e}_k^\top Q\,\mathbf{e}_k
+  \;+\; \mathbf{u}_k^\top R\,\mathbf{u}_k
+  \;+\; \Delta\mathbf{u}_k^\top R_d\,\Delta\mathbf{u}_k
+\right]
+\end{equation}
+
+% Subject to constraints
+\begin{equation}
+\label{eq:nmpc_constraints}
+\text{s.t.} \quad
+\|\mathbf{u}_k\|_\infty \leq u_{\mathrm{lim}}, \qquad
+\|\Delta\mathbf{u}_k\|_\infty \leq \Delta u_{\mathrm{lim}}
+\end{equation}
+
+% Simplified prediction model used inside NMPC
+\begin{align}
+\label{eq:nmpc_predict}
+\mathbf{p}_{k+1} &= \mathbf{p}_k + \Delta t\,\mathbf{v}_k \\
+\dot{v}_{x} &= \frac{k_{\mathrm{eff}}}{m_{\mathrm{tot}}}\,u_x
+              - c_d\,v_x \\
+\dot{v}_{y} &= \frac{k_{\mathrm{eff}}}{m_{\mathrm{tot}}}\,u_y
+              - c_d\,v_y \\
+\dot{v}_{z} &= \frac{k_{\mathrm{eff}}}{m_{\mathrm{tot}}}\,u_z
+              - g - c_d\,v_z
+\end{align}
+
+% Motor dynamics (2nd-order model)
+\begin{equation}
+\label{eq:motor}
+\ddot{u}_{m,i} = \omega_n^2\,(u_{c,i} - u_{m,i})
+               - 2\zeta\,\omega_n\,\dot{u}_{m,i}
+\end{equation}
+
+
+% ============================================================
+%  TABLE 1: SIMULATION PARAMETERS
+% ============================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Simulation Parameters}
+\label{tab:sim_params}
+\begin{tabular}{l l l}
+\hline
+\textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+\hline
+\multicolumn{3}{l}{\textit{Structure}} \\
+Number of nodes            & $N$              & 12 \\
+Number of bars             & $N_b$            & 6 \\
+Number of cables           & $N_c$            & 30 \\
+Node mass                  & $m_{\mathrm{node}}$ & 0.12\,kg \\
+Robot radius               & $r_{\mathrm{robot}}$ & $\approx 0.95$\,m \\
+\hline
+\multicolumn{3}{l}{\textit{Stiffness \& Damping}} \\
+Cable stiffness            & $k_{\mathrm{cable}}$ & 2\,000\,N/m \\
+Bar stiffness              & $k_{\mathrm{bar}}$   & 20\,000\,N/m \\
+Ground spring              & $k_{\mathrm{gnd}}$   & 5\,000\,N/m \\
+Ground dashpot             & $d_{\mathrm{gnd}}$   & 150\,N$\cdot$s/m \\
+Structural damping         & $c_{\mathrm{damp}}$  & 0.5\,N$\cdot$s/m \\
+Bar damping                & $c_{\mathrm{bar}}$   & 5.0\,N$\cdot$s/m \\
+\hline
+\multicolumn{3}{l}{\textit{Contact \& Friction}} \\
+Coulomb friction coeff.    & $\mu_c$          & 0.3 \\
+Viscous friction coeff.    & $\mu_v$          & 0.5 \\
+Ground slope               & $\theta$         & 0.03\,rad \\
+Rod collision stiffness    & $k_{\mathrm{col}}$ & 800\,N/m \\
+Rod radius                 & $r_{\mathrm{rod}}$ & 0.03\,m \\
+\hline
+\multicolumn{3}{l}{\textit{Motor Model}} \\
+Natural frequency          & $\omega_n$       & 25\,rad/s \\
+Damping ratio              & $\zeta$          & 0.7 \\
+Max actuator force         & $u_{\max}$       & 40\,N \\
+Min cable length           & $L_{\min}$       & 0.50\,m \\
+Max cable length           & $L_{\max}$       & 1.40\,m \\
+Motor PD gains             & $K_p,\;K_d$      & 80,\;12 \\
+\hline
+\multicolumn{3}{l}{\textit{Aerodynamics}} \\
+Wind velocity              & $\mathbf{v}_{\mathrm{wind}}$ & $[8.0,\;1.0,\;0]$\,m/s \\
+Drag coefficient           & $C_d$            & 1.0 \\
+Air density                & $\rho_{\mathrm{air}}$ & 1.225\,kg/m$^3$ \\
+Drag area per node         & $A_{\mathrm{node}}$  & 0.07\,m$^2$ \\
+\hline
+\multicolumn{3}{l}{\textit{NMPC}} \\
+Prediction horizon         & $N_p$            & 6 \\
+Control dimension          & $n_u$            & 3 \\
+Control limit              & $u_{\mathrm{lim}}$  & 0.15\,m \\
+Rate limit                 & $\Delta u_{\mathrm{lim}}$ & 0.06\,m \\
+Prediction time step       & $\Delta t_p$     & 0.05\,s \\
+NMPC interval              & ---              & every 5 steps \\
+\hline
+\multicolumn{3}{l}{\textit{Integration}} \\
+Time step                  & $\Delta t$       & 0.05\,s \\
+Simulation duration        & $T_{\mathrm{sim}}$ & 30.0\,s \\
+ODE solver                 & ---              & \texttt{ode15s} (stiff) \\
+\hline
+\end{tabular}
+\end{table}
+
+
+% ============================================================
+%  TABLE 2: MATERIAL PROPERTIES
+% ============================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Material Properties}
+\label{tab:materials}
+\begin{tabular}{l c c}
+\hline
+\textbf{Property} & \textbf{Cable (Dyneema SK75)} & \textbf{Bar (Al 6061-T6)} \\
+\hline
+Material type       & UHMWPE fiber            & Aluminium alloy tube \\
+Young's modulus $E$ & 100\,GPa                & 69\,GPa \\
+Tensile strength    & 3\,400\,MPa (UTS)       & 310\,MPa (UTS) \\
+Yield / allowable   & 900\,MPa                & 276\,MPa \\
+Density $\rho$      & 970\,kg/m$^3$           & 2\,700\,kg/m$^3$ \\
+Diameter            & 2\,mm                   & 10\,mm OD / 8\,mm ID \\
+Cross-section $A$   & 3.14\,mm$^2$            & 28.27\,mm$^2$ \\
+Prestrain           & 0.5\%                   & --- \\
+Prestress           & 500\,MPa                & --- \\
+\hline
+\multicolumn{3}{l}{\textit{Mass Breakdown}} \\
+\hline
+Bar mass (each)     & ---                     & $\rho_b A_b L_b$ \\
+Cable mass (each)   & $\rho_c A_c L_c$        & --- \\
+Joint mass (each)   & \multicolumn{2}{c}{20\,g (3D-printed)} \\
+Total struct. mass  & \multicolumn{2}{c}{$\approx 1.44$\,kg (sim: 12 $\times$ 0.12\,kg)} \\
+\hline
+\end{tabular}
+\end{table}
+
+
+% ============================================================
+%  TABLE 3: PERFORMANCE RESULTS
+% ============================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Simulation Performance Results}
+\label{tab:performance}
+\begin{tabular}{l l}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+\multicolumn{2}{l}{\textit{Locomotion}} \\
+Simulation time          & 30.0\,s (600 steps) \\
+Target position $(x,y)$  & $(2.0,\;0.0)$\,m \\
+Final tracking error     & reported at runtime \\
+Distance travelled       & reported at runtime \\
+Mean speed               & reported at runtime \\
+\hline
+\multicolumn{2}{l}{\textit{Energy}} \\
+Total actuator energy    & $E_{\mathrm{act}}$\,(cumulative) \\
+Locomotion efficiency    & $\eta = d_{\mathrm{trav}} / E_{\mathrm{act}}$\,[m/J] \\
+Mechanical energy drift  & reported at runtime \\
+\hline
+\multicolumn{2}{l}{\textit{Structural Integrity}} \\
+Max cable stress         & $<900$\,MPa (allowable) \\
+Max bar stress           & $<276$\,MPa (yield) \\
+Cable safety factor      & $\mathrm{SF}_c = \sigma_{\mathrm{allow}} / \sigma_{\max,c}$ \\
+Bar safety factor        & $\mathrm{SF}_b = \sigma_{\mathrm{yield}} / \sigma_{\max,b}$ \\
+Cable utilisation         & $(\sigma_{\max,c}/\sigma_{\mathrm{allow}}) \times 100\%$ \\
+Bar utilisation           & $(\sigma_{\max,b}/\sigma_{\mathrm{yield}}) \times 100\%$ \\
+\hline
+\multicolumn{2}{l}{\textit{State Estimation (UKF)}} \\
+State dimension          & 9 (pos$_3$, vel$_3$, shape$_3$) \\
+Measurement dimension    & 6 \\
+Covariance convergence   & $\mathrm{tr}(\mathbf{P})$ monitored \\
+\hline
+\end{tabular}
+\end{table}
+
+
+% ============================================================
+%  TABLE 4: SYSTEM COMPARISON (Cable Materials)
+% ============================================================
+
+
+\begin{table}[htbp]
+\centering
+\caption{Cable Material Comparison for Tensegrity Tumbleweed Robots}
+\label{tab:material_comparison}
+\begin{tabular}{l c c c c}
+\hline
+\textbf{Property} & \textbf{Dyneema SK75} & \textbf{Kevlar 49} & \textbf{Steel Wire} & \textbf{Carbon Fiber} \\
+\hline
+Young's modulus [GPa]         & 100   & 112   & 200   & 230 \\
+Tensile strength [MPa]        & 3\,400 & 3\,600 & 1\,800 & 3\,500 \\
+Density [kg/m$^3$]            & 970   & 1\,440 & 7\,800 & 1\,750 \\
+Specific strength [kN$\cdot$m/kg] & 3.51  & 2.50  & 0.23  & 2.00 \\
+UV resistance                 & Good  & Poor  & Excellent & Fair \\
+Creep resistance              & Moderate & Good & Excellent & Good \\
+Cost                          & Medium & High & Low   & Very High \\
+\hline
+\multicolumn{5}{l}{\textit{Suitability for Tensegrity Tumbleweed}} \\
+\hline
+Weight penalty                & Low   & Medium & Very High & Medium \\
+Flexibility                   & High  & Medium & Low   & Low \\
+Fatigue life                  & Excellent & Good & Fair & Good \\
+\textbf{Overall rating}       & \textbf{Best} & Good & Poor & Good \\
+\hline
+\end{tabular}
+\end{table}
+
+
+% ============================================================
+%  FUTURE WORK SECTION
+% ============================================================
+
+\section{Future Work}
+\label{sec:future_work}
+
+While the proposed tensegrity tumbleweed robot demonstrates promising results
+in simulation, several avenues for future research remain:
+
+\begin{enumerate}
+
+\item \textbf{Hardware Prototype and Experimental Validation.}
+The current work relies on a numerical simulation with penalty-based contact
+and simplified aerodynamic models. Fabricating a physical TT-6 prototype
+with Dyneema SK75 cables and aluminium 6061-T6 bars would enable
+validation of the dynamic model, friction coefficients, and NMPC
+controller performance under real-world conditions.
+
+\item \textbf{Stochastic Wind Modelling.}
+The present simulation employs a constant wind field
+$\mathbf{v}_{\mathrm{wind}} = [8.0,\;1.0,\;0]$\,m/s. Incorporating
+turbulent wind models---such as the Dryden or Von K\'{a}rm\'{a}n gust
+spectra---would improve fidelity and test the robustness of the NMPC
+controller under realistic atmospheric disturbances. Additionally,
+online wind estimation could be integrated into the UKF state vector.
+
+\item \textbf{Terrain Adaptability.}
+The ground model assumes a planar slope with uniform friction. Future
+work should investigate locomotion over uneven terrain, including rocky
+surfaces, sand, and deformable substrates, with obstacle avoidance
+integrated into the NMPC cost function.
+
+\item \textbf{Advanced Control Strategies.}
+The simplified prediction model used in the NMPC (reduced 3-DOF
+dynamics) limits optimality. Full nonlinear MPC using the tensegrity
+dynamics, reinforcement learning for gait discovery, and Model
+Predictive Path Integral (MPPI) control are promising alternatives for
+improved real-time performance.
+
+\item \textbf{Planetary Exploration Deployment.}
+Tensegrity tumbleweed robots are strong candidates for planetary
+surface exploration. Adapting the simulation to Martian conditions
+($g = 3.72$\,m/s$^2$, $\rho_{\mathrm{air}} = 0.020$\,kg/m$^3$)
+and addressing low-temperature effects on Dyneema creep properties
+would assess feasibility for extraterrestrial missions.
+
+\item \textbf{Structural Topology Optimisation.}
+The icosahedral TT-6 geometry is fixed in this study. Future work could
+explore topology optimisation of the cable network, variable-stiffness
+actuators using shape memory alloys (SMAs), and scaled-up TT-12 or
+TT-24 configurations to improve payload capacity and locomotion range.
+
+\item \textbf{Multi-Robot Coordination.}
+Deploying a swarm of tensegrity tumbleweeds for distributed sensing and
+area coverage is a natural extension. Decentralised control algorithms
+and inter-robot communication protocols would enable coordinated
+exploration over large areas.
+
+\item \textbf{Enhanced State Estimation.}
+The current UKF operates on a 9-dimensional reduced state.
+Extending to full node-level estimation (72 states) via distributed
+filtering, incorporating vision-based localisation (camera + IMU
+fusion), and adding contact-state detection for terrain classification
+would improve autonomy and situational awareness.
+
+\end{enumerate}

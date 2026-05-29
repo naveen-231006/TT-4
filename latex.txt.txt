@@ -1,0 +1,676 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{balance}
+\usepackage{flushend}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Design and Analysis of a Tensegrity-Based Tumbleweed Robot with Controlled Locomotion}
+
+\author{
+\IEEEauthorblockN{Naren Narayana~R}
+\IEEEauthorblockA{\textit{Dept. of Mechanical Engineering}\\
+\textit{Amrita School of Engineering,}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Chennai, India\\
+r.narennarayanaa2006@gmail.com}
+\and
+\IEEEauthorblockN{K.~Vyshnavi}
+\IEEEauthorblockA{\textit{Dept. of Mechanical Engineering}\\
+\textit{Amrita School of Engineering,}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Chennai, India\\
+korrapativyshnavi49@gmail.com}
+\linebreakand
+\IEEEauthorblockN{Naveen~SK}
+\IEEEauthorblockA{\textit{Dept. of Mechanical Engineering}\\
+\textit{Amrita School of Engineering,}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Chennai, India\\
+naveensknaveensk4@gmail.com}
+\and
+\IEEEauthorblockN{Piyush Pratap~Singh}
+\IEEEauthorblockA{\textit{Dept. of Mechanical Engineering}\\
+\textit{Amrita School of Engineering,}\\
+\textit{Amrita Vishwa Vidyapeetham}\\
+Chennai, India\\
+piyushpratap12@gmail.com}
+}
+
+\maketitle
+
+%------------------------------------------------------------------
+\begin{abstract}
+The robotic systems designed based on the Tensegrity has benefits of lightweight construction,
+Most existing designs are based on structural compliance and resilience, but do not make use of structural compliance.
+continuous internal actuation and consequently consume high energy. This paper will present the design and analysis of a tumbleweed robot based on tensegrity.
+Focusing on the principles that rely on minimal actuation and produce locomotion mainly by wind blowing through the environment. A Nonlinear Model Predictive Control externally, (NMPC) framework guides the direction of motion with the help of cables.
+An Unscented Kalman Filter (UKF) is used for state estimation, and an actuator is used to control the system.
+The simulations indicate that the locomotion is sustained at around 40~m for 30~s.The simulations demonstrate continuous locomotion at an average of 40~m for 30~s.
+A high level of displacement, an average velocity of 1.35~m/s and low control energy
+($\approx$107~J) Stress is structurally determined and is within safe limits and
+restrictions, validating an energy-assisted locomotion paradigm in which
+the robot is pushed by environmental forces with control being applied selectively
+for directional guidance.
+\end{abstract}
+
+\renewcommand\IEEEkeywordsname{Keywords}
+\begin{IEEEkeywords}
+Tensegrity, Tumbleweed Robot, Wind-driven locomotion, Nonlinear model.
+Predictive control, Unscented Kalman filter, Energy-assisted locomotion..
+
+\end{IEEEkeywords}
+
+%==================================================================
+\section{Introduction}
+
+\subsection{Background and Motivation}
+Plants have developed some passive mobility mechanisms,
+e.g.\ tumbleweed, release from roots and rolling,
+in windswept areas to spread over a large area with
+low energy. This enables a class of
+tumbleweed-inspired robots using passive or semi-passive rolling to
+high area coverage and low mechanical complexity \cite{b21,b12}. Such designs
+unlike conventional wind pumps,
+can be much more easily constructed and consume less energy.
+With both wheeled and legged systems there is the issue of rigid architectures, impact
+high control complexity, and vulnerability. Passive tumbleweed systems,
+but are not directionally
+controllable, hence a selective control is needed
+in the form of actuation, retaining structural efficiency
+and allowing intentional direction and steering.
+
+The potential structure for this is tensegrity structures for this purpose. A
+ tensegrity system is a combination of rigid bars, connected to one another by pre-tensioned cables,
+creating a balance of tension compression for shape retention
+and stability \cite{b1}. The tensile forces are applied throughout the structure to create an open lattice framework.
+They remain elastic when loaded and return to their original shape when unloaded force networks.
+Compliance, shock absorption and resilience \cite{b2} are offered as damage to the structure.
+It is these properties which make them acceptable for deformation-driven locomotion`11 they can be selectively adjusted to the particular conditions.
+The center of mass changes, causing the cable lengths to shift, and eliminating uncontrolled rolling.
+The only constraint imposed are the rigid joints or direct limb actuation \cite{b5,b8}.
+
+\subsection{Challenges and Research Gaps}
+
+There are many open challenges in the area of tensegrity tumbleweed robots. The dynamics
+have complex interactions between each other they are nonlinear, coupled and underactuated.
+Modelling and control is challenging with cables, bars and external forces.
+Existing methods are based on simplified dynamic models or heuristic models.
+Strategies without the cable elasticity, actuator saturation, and contact effects \cite{b7}. Autonomous navigation strategies combining reinforcement
+in learning and sensor fusion, similar problems have been tackled in
+neither a comprehensive framework nor extensive publications exist for collaborative robot systems 
+incorporating high fidelity dynamics, high degree of control.
+Tensegrity tumbleweed locomotion has not yet been shown to be feasible with estimation.\cite{b17}
+
+\subsection{Proposed Work and Contributions}
+The design and analysis of a tensegrity based tumbleweed is presented here.
+A wind powered robot that moves its body using interaction and
+selective internal cable actuation only for directional
+guidance. A TT-6 tensegrity architecture is used in the proposed system it is the six-bar, twelve-node structure with thirty cables been supplied and contains a detailed dynamic model which accounts for the elasticity of the cables, the rigidity of the bars and the dynamics of the actuators, etc.
+An NMPC framework regulates the cable , UKF gives a very good state estimation in a finite prediction horizon, and the actuation.
+The measurement noise and model uncertainty are estimated \cite{b6,b7,b10}.
+The trajectory tracking, energy saving performance over 30~s in numerical simulation is evaluated.
+A new benchmark is set for structural integrity, and estimation performance establishing
+a basis for future experimental validation \cite{b16}.
+
+
+%==================================================================
+\section{Methodology}
+
+This system architecture brings and integrates structural dynamics, sensing, estimation,
+control, and actuation in a unified closed-loop environment, as shown 
+in the Fig.~\ref{fig:architecture}. Initialization establishes geometric
+configuration, material-properties, prestress-conditions, and actuator
+parameters, followed sequentially by dynamic modeling, state estimation,
+and control computation.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image1.png}
+  \caption{Closed loop interaction between components of the system in the system architecture
+           When the UKF is included, the sensor measurements and the structural dynamics plant are among the structural dynamics.
+           The state estimator, NMPC controller and actuator module.
+}
+  \label{fig:architecture}
+\end{figure}
+
+The sensor measurements from the sensors were shown in Fig.~\ref{fig:architecture} as shown
+physical plant are fed to the UKF leading to filtered estimates of
+Nodal positions and nodal velocities. Such estimates are provided to the NMPC,
+which chooses the optimal action at time t from a set of actions and rewards that depend on the current state of the system.
+outputs cable-length commands.Those commands are used by the actuator module closing the feedback loop to the tensegrity structure. This modular uncertainty of estimation and the design of the control are separated in a clean manner in the architecture, and
+Enable independence of tuning and validation for each component .
+
+%------------------------------------------------------------------
+\subsection{Dynamic Modeling}
+
+Every node has forces applied to it from the tension of the cables, compression of the bars, and gravity,
+interaction with wind \cite{b3,b4}. Newton's Law of Motion is used for node $i$.
+second law:
+%
+\begin{equation}
+\ddot{\mathbf{q}}_i = \frac{\mathbf{F}_i}{m_{\mathrm{node}}}
+\end{equation}
+%
+where the total nodal force is:
+%
+\begin{equation}
+\mathbf{F}_i = \mathbf{F}_{\mathrm{cable},i} + \mathbf{F}_{\mathrm{bar},i}
+             + \mathbf{F}_{\mathrm{grav},i} + \mathbf{F}_{\mathrm{contact},i}
+             + \mathbf{F}_{\mathrm{fric},i} + \mathbf{F}_{\mathrm{wind},i}
+             + \mathbf{F}_{\mathrm{damp},i}
+\end{equation}
+
+Rigid bars are simulated by bilateral penalty springs. Ground contact uses takes into account penalty normal force and Coulomb and viscous friction. Wind loading applies
+a quadratic drag force to nodes above the structure's center of
+Mass (COM) represents a kind of level-0 cover and is the only variable used to approximate actual ground level cover \cite{b12}. 
+The damping is proportional to the velocity of each node, and it is applied to all nodes. The equations and the integration of  motion is done with a stiff numerical integrator (\texttt{ode15s}).
+
+Cable tension uses a softplus activation for smooth differentiability:
+%
+\begin{equation}
+\sigma(s) = \tfrac{1}{2}\!\left(s + \sqrt{s^2 + \varepsilon}\right), \quad
+f_{\mathrm{cable}} = \max\!\bigl(0,\; k_{\mathrm{cable}}\,\sigma(s) + u_{m,i}\bigr)
+\end{equation}
+%
+where $s = L - L_0$ is the cable elongation and $u_{m,i}$ is the elongation of the cable and $u_{m,i}$ is the actuator contribution. This formulation is different from a hard in that there is no issue of non-differentiability.
+The point is that there is a max(0, s) clamp that will slow down the gradient-based optimization.
+
+%------------------------------------------------------------------
+\subsection{State Estimation and Control}
+
+An Unscented Kalman Filter (UKF) is used for noisy sensor observations which are  able to deal with nonlinear dynamics and uncertainty in the system \cite{b7}
+sending accurate state estimates to controller. This is consistent
+arm systems in the field of adaptive estimation.Collaborative Robotic Arm systems with adaptive estimation approaches were shown in the field of adaptive estimation.
+systems \cite{b20,b22}.
+
+The NMPC framework gets the UKF state estimates and optimizes 
+a finite horizon $N_p$ cost function \cite{b6,b10}:
+
+%
+\begin{equation}
+J = \sum_{k=1}^{N_p} \left[
+  w_k\,\mathbf{e}_k^\top Q\,\mathbf{e}_k
+  + \mathbf{u}_k^\top R\,\mathbf{u}_k
+  + \Delta\mathbf{u}_k^\top R_d\,\Delta\mathbf{u}_k
+\right]
+\end{equation}
+%
+where $\mathbf{e}_k = \mathbf{x}_k - \mathbf{x}_{\mathrm{ref}}$
+state tracking error, $\Delta\mathbf{u}_k = \mathbf{u}_k - \mathbf{u}_{k-1}$
+is the control increment and the terminal weight is $w_{N_p} = 3$ (else~1).
+A reduced order linear prediction model is used to model the dominant translational modes.
+The full dynamics of the rolling COM is used for computational tractability.
+The optimization subject to the box constraints:
+%
+\begin{equation}
+\|\mathbf{u}_k\|_\infty \leq u_{\mathrm{lim}}, \qquad
+\|\Delta\mathbf{u}_k\|_\infty \leq \Delta u_{\mathrm{lim}}
+\end{equation}
+
+A full list of simulation parameters can be found in Table~\ref{tab:sim_params}. The table is organized in six groups of parameters. The \textit{Structure} group defines the \textit{TT-6} topology (12 nodes, 6 bars, 30 cables), the mass of the nodes and the overall robot radius. The \textit{Stiffness and Damping} group defines separate spring constants for cables and bars, and ground contact spring and dashpot values in the penalty contact model. The \textit{Contact and Friction} group provides the Coulomb and viscous friction coefficients and the ground slope angle. Second-order natural frequency, damping ratio, maximum output force of actuators, and limits on cable lengths are in the group of \textit{Motor Model}. The \textit{Aerodynamics} group specifies the applied wind velocity vector, drag coefficient, air density, and effective drag area per exposed node.Lastly, the \textit{NMPC} group makes the forecast
+horizon length, control and rate limits and prediction time
+step used by the optimizer.
+
+\begin{table}[!t]
+\centering
+\caption{Simulation Parameters}
+\label{tab:sim_params}
+\begin{tabular}{l l l}
+\hline
+\textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+\hline
+\multicolumn{3}{l}{\textit{Structure}} \\
+Nodes / Bars / Cables         & $N,N_b,N_c$           & 12, 6, 30 \\
+Node mass                     & $m_{\mathrm{node}}$   & 0.12\,kg \\
+Robot radius                  & $r_{\mathrm{robot}}$  & $\approx$0.95\,m \\
+\hline
+\multicolumn{3}{l}{\textit{Stiffness and Damping}} \\
+Cable stiffness               & $k_c$                 & 2000\,N/m \\
+Bar stiffness                 & $k_b$                 & 20000\,N/m \\
+Ground spring                 & $k_g$                 & 5000\,N/m \\
+Ground dashpot                & $d_g$                 & 150\,N$\cdot$s/m \\
+Structural damping            & $c_d$                 & 0.5\,N$\cdot$s/m \\
+Bar damping                   & $c_b$                 & 5.0\,N$\cdot$s/m \\
+\hline
+\multicolumn{3}{l}{\textit{Contact and Friction}} \\
+Coulomb friction coefficient  & $\mu_c$               & 0.3 \\
+Viscous friction coefficient  & $\mu_v$               & 0.5 \\
+Ground slope                  & $\theta$              & 0.03\,rad \\
+\hline
+\multicolumn{3}{l}{\textit{Motor Model}} \\
+Natural frequency             & $\omega_n$            & 25\,rad/s \\
+Damping ratio                 & $\zeta$               & 0.7 \\
+Max actuator force            & $u_{\max}$            & 40\,N \\
+Min cable length              & $L_{\min}$            & 0.50\,m \\
+Max cable length              & $L_{\max}$            & 1.40\,m \\
+\hline
+\multicolumn{3}{l}{\textit{Aerodynamics}} \\
+Wind velocity vector          & $\mathbf{v}_{\mathrm{wind}}$ & $[8.0,\;1.0,\;0]$\,m/s \\
+Drag coefficient              & $C_d$                 & 1.0 \\
+Air density                   & $\rho$                & 1.225\,kg/m$^3$ \\
+Drag area per node            & $A_{\mathrm{node}}$   & 0.07\,m$^2$ \\
+\hline
+\multicolumn{3}{l}{\textit{NMPC}} \\
+Prediction horizon            & $N_p$                 & 6 \\
+Control limit                 & $u_{\mathrm{lim}}$    & 0.15\,m \\
+Rate limit                    & $\Delta u_{\mathrm{lim}}$ & 0.06\,m \\
+Prediction time step          & $\Delta t_p$          & 0.05\,s \\
+\hline
+\multicolumn{3}{l}{\textit{Integration}} \\
+Time step                     & $\Delta t$            & 0.05\,s \\
+Simulation duration           & $T$                   & 30.0\,s \\
+ODE solver                    & ---                   & \texttt{ode15s} (stiff) \\
+\hline
+\end{tabular}
+\end{table}
+
+%==================================================================
+\section{Results and Discussion}
+
+\subsection{Energy, Material, and Dynamic Behavior}
+
+During the 30~s simulation, the mechanical energy gradually increases,
+confirming that the external wind is the main force that leads
+of locomotion \cite{b11}. The total energy of the actuators is conserved in
+a range of 100--110~J that are only suitable for direction
+rather than propulsion. In the case of high power peaks, it is during the
+first part to set the bias direction of the roll, and the second part of the steady-state
+consumption decreases significantly as compared to
+the continuously actuated tensegrity robots \cite{b17}.
+
+The energy budget and the actuation profile are shown in Fig.~\ref{fig:energy}
+throughout the entire simulation. The rise of the kinetic energy trace is high
+during the first few seconds, as the wind speeds up and increases the force on
+the structure, then enters a close to steady oscillatory band of
+the periodic rolling regime. Actuator effort is focused
+in brief spurts in synchronism with the heading changes, showing
+that the NMPC activates cables only if it is in the wrong direction,
+thereby preserving the passive energy-harvesting character of the design.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image2.png}
+  \caption{Time needed to perform the energy budget and actuation profile
+           over 30~s. The kinetic energy actuator energy bursts (AEB)
+           confirm wind-driven locomotion. The total energy of the control
+           is concentrated in heading corrections, ensuring the total
+           control energy is kept below 110~J.}
+  \label{fig:energy}
+\end{figure}
+
+The amount of wind that can be obtained depends on the type of cable used to change energy into a useful structural form of deformation. Dyneema SK75 is a prestress of approximately 500~MPa for a total structural mass of just 1.44~kg, making it an extremely lightweight structure highly responsive to the aerodynamic forcing.
+In Fig.~\ref{fig:material} we compare the specific strength values of standard type of cable material, and the distribution of mass on the structural members.
+Dyneema SK75 has a great strength-to-weight ratio with a specific strength of 3.51~kN$\cdot$m/kg, the strongest of all the candidates considered, and has an excellent fatigue resistance. Also, it has the ability to undergo repeated deformations during rolling locomotion.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image3.png}
+  \caption{Comparing materials and distribution of mass within the structures. The bar chart
+           ranks cable materials according to specific strength, Dyneema SK75 ranks
+           highest, which makes the overall structural weight of just 1.44~kg while
+           sustaining the required 500~MPa prestress level.}
+  \label{fig:material}
+\end{figure}
+
+Under constant wind velocity the forward velocity of the
+robot is between about 1.2 and 1.6~m/s, which is indicative
+of stable periodic rolling and not irregular tumbling. Fig.~\ref{fig:phase}
+shows the velocity-time-history along with the phase-space
+portrait of the COM motion. The phase portrait is very clear
+and passes the starting point of the spiral to move towards
+the center---into a closed limit cycle, confirming that
+the system is forced to a well-defined periodic
+steady state since the wind is constant and NMPC guidance.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image4.png}
+  \caption{Time evolution and COM phase-portrait. The velocity
+           fluctuates between 1.2 and 1.6~m/s at steady state, with the phase portrait
+           showing stable transitions from a transient spiral to a closed limit cycle,
+           confirming periodic rolling.}
+  \label{fig:phase}
+\end{figure}
+
+The three cable configurations have been investigated in terms of their deformation history, which is presented in Fig.~\ref{fig:deform}.
+All groups have large-amplitude
+oscillations during the initial transient as the structure is set up under
+combined wind and gravity loading. After
+approximately 5~s, the deformations come to an orderly state,
+with lower-amplitude oscillatory patterns at dynamic equilibrium.
+This coordinated action demonstrates that locomotion is
+controlled by internal force redistribution across the tensegrity
+network as opposed to rigid-body sliding \cite{b8}, validating the
+deformation-driven rolling principle.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image5.png}
+  \caption{Cable group deformation histories over 30~s. All three groups
+           show large initial transients that decay into synchronized
+           low-amplitude oscillations, confirming that locomotion arises
+           from coordinated internal force redistribution at dynamic
+           equilibrium.}
+  \label{fig:deform}
+\end{figure}
+
+\subsection{Structural Integrity and Material Properties}
+
+Safeguarding the structural against dangerous stresses
+Snow loading combined with prestress can be accommodated in some cases.Combined stress of snow and prestress can be accepted in some cases.
+is crucial for good field deployments. Table II summarizes
+Properties of the mechanical characteristics of the two types of members.
+Fig. 5. The aim is to get cable groups to approximate deformation histories for over 30 s. All three groups
+Display large starting transients getting smaller to synchronized, low amplitude output;
+The oscillations were observed, which could be reasonably attributed to internal force such that can be accompanied by other coordinated components associated with locomotion.
+show redistribution to achieve dynamic equilibrium.
+The TT-6 frame features a Versamax tension area that has been selected. Group the words within each of the items in the table.
+lists Youngs modulus/ tensile strength / yield/ allowable
+stress, density, cross section diameter, operating prestress,
+Specific strength (when appropriate) and and specific power. The Dyneema SK75
+The tensile strength of cables is very high, as high as 3400 MPa.
+and yield allowable of 900 MPa which gives a good margin of safety.
+At a higher prestress of 500 MPa. The aluminum
+A good balance of stiffness (Young's) and corrosion resistance that is much better than 6063-T630.
+modulus 69 GPa) and low density (2700 kg/m3). Their hollow
+Maximum second in 10 mm OD 8 mm ID cross section
+Optimum modification in minimising mass providing maximum moment of area for bending resistance.
+
+\begin{table}[!t]
+\centering
+\caption{Material Properties of Structural Members}
+\label{tab:materials}
+\begin{tabular}{l c c}
+\hline
+\textbf{Property} & \textbf{Cable (Dyneema SK75)} & \textbf{Bar (Al 6061-T6)} \\
+\hline
+Young's modulus        & 100\,GPa              & 69\,GPa \\
+Tensile strength       & 3400\,MPa             & 310\,MPa \\
+Yield / allowable      & 900\,MPa              & 276\,MPa \\
+Density                & 970\,kg/m$^3$         & 2700\,kg/m$^3$ \\
+Diameter               & 2\,mm                 & 10\,mm OD / 8\,mm ID \\
+Operating prestress    & 500\,MPa              & --- \\
+Specific strength      & 3.51\,kN$\cdot$m/kg  & --- \\
+\hline
+\end{tabular}
+\end{table}
+
+The stress of the cables and bars are shown as functions of Fig. 6.
+The materials with which each must pull throughout the simulation.
+Cable stresses are approximately 500 MPa - which is 58% of - the breaking point for the cable steel.
+The
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image6.png}
+  \caption{Cable and bar stress levels versus material limits over the
+           30~s simulation. Cables operate at 58\% utilization (safety
+           factor 1.73) and bars at 82\% utilization (safety factor
+           1.22), confirming safe structural operation throughout.}
+  \label{fig:stress}
+\end{figure}
+
+Fig.~\ref{fig:baseline} compares the lateral trajectory of the NMPC-controlled robot with a passive baseline without cable actuation. In the absence of control the robot drifts 4.5 m laterally in 30 s due to the cross-wind component ($v_y = 1.0$ m/s).
+The lateral deviation is reduced to 3.9~m under the guidance of NMPC, which achieves a 13% improvement in heading fidelity . Although the amount of the absolute drift reduction appears modest in meters, it is significant over longer traversals and shows that selective cable actuation is enough to steer a predominantly passive wind-driven platform without the need to resort to continuous effort by a motor.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{fig_baseline_comparison.png}
+  \caption{Lateral trajectory comparison between passive (no control)
+           and NMPC-controlled rolling. NMPC reduces the lateral drift
+           from 4.5~m to 3.9~m over 30~s, a 13\% improvement in
+           heading fidelity achieved with selective cable actuation only.}
+  \label{fig:baseline}
+\end{figure}
+
+\subsection{Trajectory, Control, and Estimation Performance}
+
+The NMPC controller focuses on a waypoint in a distant position (50, 0) m.The NMPC controller looks in a distant direction, on a waypoint at (50, 0) m.
+Measured a velocity of 1.8 m/s, and with a desired velocity of 1.4 m/s, the actual velocity measured was
+The constant wind input is the main controlling factor of displacement.
+Lateral drift, even though there was a cross wind (vy = 1.0 m/s).
+Imagine to introduce a neat summary of the main quantitative results of
+the simulation. Participants from the Locomotion group confirm meaningful.
+Fig. 8. Consolidated diagnostics of trajectory, control and estimation over 30 s.
+Panels show (top to bottom): the 2-D COM path against the target heading,
+X \& Y Position Components, Tracking Error, Actuator Energy, NMPC Cablelength
+All inputs agree on stability, efficiency and good state of estimation in the learned covariance, namely
+closed-loop locomotion.
+Or at least, a displacement at a practical speed if these are to be explored across large area.
+tasks. Energy group emphasises the efficiency benefit of
+The robot travels of the energy-assisted paradigm at 0.38 m/J.
+Has much more ground to cover per joule than continuously actuated.
+alternatives.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\linewidth]{image8.png}
+  \caption{Consolidated trajectory, control, and estimation diagnostics
+           over 30~s. Panels show (top to bottom): the 2-D COM path
+           against the target heading, $x$ and $y$ position components,
+           tracking error, actuator energy, NMPC cable-length inputs,
+           and UKF covariance---all confirming stable, efficient, and
+           well-estimated closed-loop locomotion.}
+  \label{fig:trajectory}
+\end{figure}
+
+Table~\ref{tab:performance} summarizes the key quantitative outcomes of
+the simulation. The \textit{Locomotion} group confirms meaningful
+speed of the displacement suitable for wide-area exploration, as practical
+tasks. The \textit{Energy} group focuses on efficiency benefit of
+the energy-assisted paradigm: at 0.38~m/J, the robot covers
+more than twice as much work per joule than continuously actuated
+alternatives. The
+\textit{Structural Integrity} group confirms safe operation with positive
+safety margins on both cables and bars. The \textit{State Estimation}
+group shows that the nine-dimensional state vector is reconstructed from
+a six-dimensional measurement vector with monotonically decreasing
+uncertainty, validating the robustness of the UKF pipeline.
+
+\begin{table}[!t]
+\centering
+\caption{Simulation Performance Results}
+\label{tab:performance}
+\begin{tabular}{l l}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+\multicolumn{2}{l}{\textit{Locomotion}} \\
+Total distance traveled       & $\approx$40.4\,m \\
+Mean speed                    & 1.35\,m/s \\
+Peak speed                    & $\approx$1.6\,m/s \\
+Lateral deviation             & $\approx$3.9\,m ($5.6^\circ$ error) \\
+\hline
+\multicolumn{2}{l}{\textit{Energy}} \\
+Total actuator energy         & $\approx$107\,J \\
+Locomotion efficiency         & $\approx$0.38\,m/J \\
+\hline
+\multicolumn{2}{l}{\textit{Structural Integrity}} \\
+Max cable stress              & 520\,MPa \\
+Max bar stress                & 225\,MPa \\
+Cable safety factor           & 1.73 \\
+Bar safety factor             & 1.22 \\
+\hline
+\multicolumn{2}{l}{\textit{State Estimation (UKF)}} \\
+State vector dimension        & 9 \\
+Measurement vector dimension  & 6 \\
+Covariance trend              & Monotonically decreasing \\
+\hline
+\end{tabular}
+\end{table}
+
+%==================================================================
+\section{Conclusion}
+
+This paper presents design and analysis of a tensegrity based tumbleweed robot that achieves locomotion through environmental wind interaction with minimal internal actuation for directional control
+\cite{b21}. The lightweight prestressed tensegrity structure enables the
+deformation-driven rolling \cite{b3,b5}; an NMPC framework governs
+direction through selective cable actuation \cite{b6,b10}; and
+UKF-based state estimation handles uncertainty \cite{b7}. Adaptive
+navigation strategies combining reinforcement learning and sensor fusion
+\cite{b20,b22,b23} informed the design of the estimation and control
+pipeline.Informed the design of the estimation and control pipeline . Simulation results demonstrate a stable locomotion with
+$\approx$40~m displacement in 30~s (1.35~m/s average), $\approx$107~J
+control energy, and structural operation within safe limits \cite{b4,b16}.
+
+Future work
+will focus on physical prototype testing, turbulent wind and will visit local museums to scope out their collections and interests.
+The distance measurement problem can be solved by uneven terrain modelling, learning-based control [9, [15] is published.
+HPC for real time embedded NMPC,
+Application of and fatigue analysis with cyclic loading.
+
+%==================================================================
+\balance
+{\small
+\begin{thebibliography}{00}
+
+\bibitem{b1}
+R.~E. Skelton and M.~C. de~Oliveira,
+\textit{Tensegrity Systems}.
+New York, NY: Springer, 2009.
+doi: \href{https://doi.org/10.1007/978-0-387-74242-7}{10.1007/978-0-387-74242-7}
+
+\bibitem{b2}
+D.~Song, H.~Wang, M.~Lu, H.~Chen, and L.~Zhang,
+``A novel cable-driven serial robot based on flexible joints and tensegrity
+structures,''
+\textit{Robotica}, vol.~43, no.~10, pp.~3533--3553, 2025.
+doi: \href{https://doi.org/10.1017/S0263574725102543}{10.1017/S0263574725102543}
+
+\bibitem{b3}
+C.~Sultan,
+``Tensegrity deployment using infinitesimal mechanisms,''
+\textit{Int. J. Solids Struct.}, vol.~51, no.~21--22, pp.~3653--3668, 2014.
+doi: \href{https://doi.org/10.1016/j.ijsolstr.2014.06.025}{10.1016/j.ijsolstr.2014.06.025}
+
+\bibitem{b4}
+P.~Obara and J.~Tomasik,
+``Dynamic stability of tensegrity structures---{Part II}: The periodic
+external load,''
+\textit{Materials}, vol.~16, no.~13, p.~4564, 2023.
+doi: \href{https://doi.org/10.3390/ma16134564}{10.3390/ma16134564}
+
+\bibitem{b5}
+M.~Shibata and S.~Hirai,
+``Rolling locomotion of deformable tensegrity structure,''
+in \textit{Mobile Robotics}.
+Singapore: World Scientific, 2009, pp.~479--486.
+doi: \href{https://doi.org/10.1142/9789814291279_0059}{10.1142/9789814291279\_0059}
+
+\bibitem{b6}
+S.~Bagherzadeh, H.~Karimpour, and M.~Keshmiri,
+``Neighboring extremal nonlinear model predictive control of a rigid body
+on {SO(3)},''
+\textit{Robotica}, vol.~41, no.~4, pp.~1313--1334, 2023.
+doi: \href{https://doi.org/10.1017/S0263574722001722}{10.1017/S0263574722001722}
+
+\bibitem{b7}
+K.~Caluwaerts, J.~Bruce, J.~M. Friesen, and V.~SunSpiral,
+``State estimation for tensegrity robots,''
+in \textit{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)},
+Stockholm, Sweden, 2016, pp.~1860--1865.
+doi: \href{https://doi.org/10.1109/ICRA.2016.7487331}{10.1109/ICRA.2016.7487331}
+
+\bibitem{b8}
+B.~D. Layer, H.~Denning, and J.~R. Hill,
+``Control and locomotion of tensegrity robots through manipulation of the
+center of mass,''
+\textit{Robotica}, vol.~42, no.~9, pp.~2885--2907, 2024.
+doi: \href{https://doi.org/10.1017/S0263574724001139}{10.1017/S0263574724001139}
+
+\bibitem{b9}
+M.~Zhang \textit{et al.},
+``Deep reinforcement learning for tensegrity robot locomotion,''
+in \textit{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)},
+Singapore, 2017, pp.~634--641.
+doi: \href{https://doi.org/10.1109/ICRA.2017.7989079}{10.1109/ICRA.2017.7989079}
+
+\bibitem{b10}
+M.~Diehl, H.~G. Bock, and J.~P. Schl\"{o}der,
+``A real-time iteration scheme for nonlinear optimization in optimal
+feedback control,''
+\textit{SIAM J. Control Optim.}, vol.~43, no.~5, pp.~1714--1736, 2005.
+doi: \href{https://doi.org/10.1137/S0363012902400713}{10.1137/S0363012902400713}
+
+\bibitem{b11}
+S.~Kurian and S.~Upadhyay,
+``Wind-powered locomotion mechanism for a wandering robot exploring {Titan},''
+in \textit{Proc. 18th Symp. Advanced Space Technol. Robot. Autom.\ (ASTRA)},
+ESA/ESTEC, Noordwijk, Netherlands, May 2025.
+
+\bibitem{b12}
+J.~Antol \textit{et al.},
+``Low cost {Mars} surface exploration: {The Mars Tumbleweed},''
+NASA Langley Research Center, Hampton, VA,
+Tech. Rep. NASA/TM-2003-212411, Aug. 2003.
+[Online]. Available: \url{https://ntrs.nasa.gov/citations/20030068113}
+
+\bibitem{b16}
+M.~Vlasblom and R.~Bosman,
+``Predicting the creep lifetime of {UHMWPE} fibre in rope and
+chain applications,''
+in \textit{Proc. OCEANS 2006},
+Boston, MA, Sep. 2006, pp.~1--8.
+doi: \href{https://doi.org/10.1109/OCEANS.2006.306966}{10.1109/OCEANS.2006.306966}
+
+\bibitem{b17}
+A.~P. Sabelhaus \textit{et al.},
+``System design and locomotion of {SUPERball}, an untethered tensegrity
+robot,''
+in \textit{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)},
+Seattle, WA, May 2015, pp.~2867--2873.
+doi: \href{https://doi.org/10.1109/ICRA.2015.7139590}{10.1109/ICRA.2015.7139590}
+
+\bibitem{b20}
+R.~Tiwari, A.~Srinivaas, and R.~K. Velamati,
+``Adaptive navigation in collaborative robots: A reinforcement learning and
+sensor fusion approach,''
+\textit{Appl. Syst. Innov.}, vol.~8, no.~1, p.~9, 2025.
+doi: \href{https://doi.org/10.3390/asi8010009}{10.3390/asi8010009}
+
+\bibitem{b21}
+T.~J. Thanush, K.~Vyshnavi, N.~N.~R, N.~S.~K, and P.~P. Singh,
+``Tumbleweed-inspired autonomous seeding robot with tensegrity structure and
+reinforcement learning control,''
+in \textit{Proc. Int. Conf. Comput. Commun. Autom. Technol. (ICCCAT)},
+2025.
+doi: \href{https://doi.org/10.1109/ICCCAT64205.2025.10904358}{10.1109/ICCCAT64205.2025.10904358}
+
+\bibitem{b22}
+R.~K. Megalingam, V.~S. Naick, M.~Motheram, J.~Yannam, N.~C. Gutlapalli,
+and V.~Sivanantham,
+``Robot operating system based autonomous navigation platform with human
+robot interaction,''
+\textit{TELKOMNIKA}, vol.~21, no.~3, 2023.
+doi: \href{https://doi.org/10.12928/telkomnika.v21i3.24257}{10.12928/telkomnika.v21i3.24257}
+
+\bibitem{b23}
+``Novel multiagent reinforcement learning framework using twin delayed deep
+deterministic policy gradient for adaptive {PID} control in boiler turbine
+systems,''
+\textit{PMC}, 2024.
+[Online]. Available: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC12494727}
+
+\end{thebibliography}
+}
+
+\end{document}
